@@ -1,0 +1,27 @@
+# Virtual Environment
+.venv/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Upload pengguna
+mata_kuliah/
+
+# Hasil analisis
+hasil/
+
+# Log
+*.log
+
+# Word sementara
+*.docx

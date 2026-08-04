@@ -1,0 +1,1069 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ mata_kuliah.nama }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-journal-bookmark-fill text-primary"></i>
+
+                {{ mata_kuliah.nama }}
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                Kelola seluruh modul, artefak, dan hasil analisis AI.
+
+            </p>
+
+        </div>
+
+        <div class="mt-3 mt-lg-0 d-flex gap-2 flex-wrap">
+
+            <a
+                href="{{ url_for('main.index') }}"
+                class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Dashboard
+
+            </a>
+
+            <a
+                href="{{ url_for('main.form_rename_mata_kuliah', nama=mata_kuliah.nama) }}"
+                class="btn btn-warning">
+
+                <i class="bi bi-pencil-square"></i>
+
+                Rename
+
+            </a>
+
+            <form
+                action="{{ url_for('main.hapus_mata_kuliah', nama=mata_kuliah.nama) }}"
+                method="post"
+                class="d-inline"
+                onsubmit="return confirm('Yakin ingin menghapus mata kuliah beserta seluruh file?');">
+
+                <button
+                    class="btn btn-danger">
+
+                    <i class="bi bi-trash-fill"></i>
+
+                    Hapus
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- STATISTIK -->
+    <!-- ====================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="display-5 text-primary">
+
+                        <i class="bi bi-files"></i>
+
+                    </div>
+
+                    <h2 class="fw-bold mt-3">
+
+                        {{ mata_kuliah.jumlah_file }}
+
+                    </h2>
+
+                    <div class="text-muted">
+
+                        Total File
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="display-5 text-success">
+
+                        <i class="bi bi-fonts"></i>
+
+                    </div>
+
+                    <h2 class="fw-bold mt-3">
+
+                        {{ "{:,}".format(mata_kuliah.jumlah_karakter) }}
+
+                    </h2>
+
+                    <div class="text-muted">
+
+                        Total Karakter
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="display-5 text-warning">
+
+                        <i class="bi bi-cpu-fill"></i>
+
+                    </div>
+
+                    {% if hasil %}
+
+                    <span class="badge bg-success fs-6">
+
+                        Sudah Dianalisis
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge bg-warning text-dark fs-6">
+
+                        Belum Dianalisis
+
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- UPLOAD -->
+    <!-- ====================================================== -->
+
+    <div class="row g-4 mb-5">
+
+        <!-- ============================ -->
+        <!-- Upload Modul -->
+        <!-- ============================ -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-primary text-white">
+
+                    <i class="bi bi-book-fill"></i>
+
+                    Upload Modul
+
+                </div>
+
+                <div class="card-body">
+
+                    <form
+                        id="uploadModulForm"
+                        action="{{ url_for('main.upload_modul', nama=mata_kuliah.nama) }}"
+                        method="post"
+                        enctype="multipart/form-data">
+
+                        <div class="mb-3">
+
+                            <input
+                                id="modulInput"
+                                class="form-control"
+                                type="file"
+                                name="file"
+                                multiple
+                                required>
+
+                        </div>
+
+                        <button
+                            id="uploadModulButton"
+                            class="btn btn-primary w-100">
+
+                            <i class="bi bi-upload"></i>
+
+                            Upload Modul
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ============================ -->
+        <!-- Upload Artefak -->
+        <!-- ============================ -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-success text-white">
+
+                    <i class="bi bi-folder-fill"></i>
+
+                    Upload Artefak
+
+                </div>
+
+                <div class="card-body">
+
+                    <form
+                        id="uploadArtefakForm"
+                        action="{{ url_for('main.upload_artefak', nama=mata_kuliah.nama) }}"
+                        method="post"
+                        enctype="multipart/form-data">
+
+                        <div class="mb-3">
+
+                            <input
+                                id="artefakInput"
+                                class="form-control"
+                                type="file"
+                                name="file"
+                                multiple
+                                required>
+
+                        </div>
+
+                        <button
+                            id="uploadArtefakButton"
+                            class="btn btn-success w-100">
+
+                            <i class="bi bi-upload"></i>
+
+                            Upload Artefak
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- DAFTAR FILE -->
+    <!-- ====================================================== -->
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <div class="input-group">
+
+            <span class="input-group-text">
+
+                <i class="bi bi-search"></i>
+
+            </span>
+
+            <input
+                type="text"
+                id="searchFile"
+                class="form-control"
+                placeholder="Cari modul atau artefak...">
+
+        </div>
+
+    </div>
+
+</div>
+    <div class="row g-4">
+                <!-- ====================================================== -->
+        <!-- DAFTAR MODUL -->
+        <!-- ====================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <i class="bi bi-book-fill"></i>
+
+                        Daftar Modul
+
+                    </div>
+
+                    <span class="badge bg-light text-primary">
+
+                        {{ mata_kuliah.modul|length }}
+
+                    </span>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    {% if mata_kuliah.modul %}
+
+                    <div class="list-group list-group-flush">
+
+                        {% for file in mata_kuliah.modul %}
+
+                        <div class="list-group-item py-3 file-item">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div class="d-flex align-items-start">
+
+                                    <div class="me-3 mt-1">
+
+                                        {% set ext = file.nama.split('.')[-1].lower() %}
+
+                                        {% if ext == "pdf" %}
+
+                                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-2"></i>
+
+                                        {% elif ext == "docx" %}
+
+                                        <i class="bi bi-file-earmark-word-fill text-primary fs-2"></i>
+
+                                        {% elif ext == "pptx" %}
+
+                                        <i class="bi bi-file-earmark-slides-fill text-warning fs-2"></i>
+
+                                        {% elif ext == "xlsx" %}
+
+                                        <i class="bi bi-file-earmark-excel-fill text-success fs-2"></i>
+
+                                        {% else %}
+
+                                        <i class="bi bi-file-earmark-fill text-secondary fs-2"></i>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            {{ file.nama }}
+
+                                        </div>
+
+                                        <div class="small text-muted">
+
+                                            {{ "{:,}".format(file.ukuran) }} byte
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end">
+
+                                    {% set ext = file.nama.split('.')[-1].lower() %}
+
+{% if ext == "pdf" %}
+
+<a
+    href="{{ url_for(
+        'main.preview_file',
+        nama=mata_kuliah.nama,
+        kategori='modul',
+        nama_file=file.nama
+    ) }}"
+    target="_blank"
+    class="btn btn-outline-info btn-sm mb-1">
+
+    <i class="bi bi-eye"></i>
+
+</a>
+
+{% endif %}
+
+<a
+    href="{{ url_for(
+        'main.download_file',
+        nama=mata_kuliah.nama,
+        kategori='modul',
+        nama_file=file.nama
+    ) }}"
+    class="btn btn-outline-primary btn-sm mb-1">
+
+    <i class="bi bi-download"></i>
+
+</a>
+
+                                    <form
+
+                                        action="{{ url_for('main.hapus_file', nama=mata_kuliah.nama, kategori='modul', nama_file=file.nama) }}"
+
+                                        method="post"
+
+                                        class="d-inline"
+
+                                        onsubmit="return confirm('Hapus file ini?');">
+
+                                        <button
+
+                                            class="btn btn-outline-danger btn-sm">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="text-center py-5">
+
+                        <i class="bi bi-folder2-open display-4 text-muted"></i>
+
+                        <p class="mt-3 text-muted">
+
+                            Belum ada modul.
+
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- ====================================================== -->
+        <!-- DAFTAR ARTEFAK -->
+        <!-- ====================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <i class="bi bi-folder-fill"></i>
+
+                        Daftar Artefak
+
+                    </div>
+
+                    <span class="badge bg-light text-success">
+
+                        {{ mata_kuliah.artefak|length }}
+
+                    </span>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    {% if mata_kuliah.artefak %}
+
+                    <div class="list-group list-group-flush">
+
+                        {% for file in mata_kuliah.artefak %}
+
+                        <div class="list-group-item py-3 file-item">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div class="d-flex align-items-start">
+
+                                    <div class="me-3 mt-1">
+
+                                        {% set ext = file.nama.split('.')[-1].lower() %}
+
+                                        {% if ext == "pdf" %}
+
+                                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-2"></i>
+
+                                        {% elif ext == "docx" %}
+
+                                        <i class="bi bi-file-earmark-word-fill text-primary fs-2"></i>
+
+                                        {% elif ext == "pptx" %}
+
+                                        <i class="bi bi-file-earmark-slides-fill text-warning fs-2"></i>
+
+                                        {% elif ext == "xlsx" %}
+
+                                        <i class="bi bi-file-earmark-excel-fill text-success fs-2"></i>
+
+                                        {% else %}
+
+                                        <i class="bi bi-file-earmark-fill text-secondary fs-2"></i>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            {{ file.nama }}
+
+                                        </div>
+
+                                        <div class="small text-muted">
+
+                                            {{ "{:,}".format(file.ukuran) }} byte
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="text-end">
+
+                                    {% set ext = file.nama.split('.')[-1].lower() %}
+
+{% if ext == "pdf" %}
+
+<a
+    href="{{ url_for(
+        'main.preview_file',
+        nama=mata_kuliah.nama,
+        kategori='artefak',
+        nama_file=file.nama
+    ) }}"
+    target="_blank"
+    class="btn btn-outline-info btn-sm mb-1">
+
+    <i class="bi bi-eye"></i>
+
+</a>
+
+{% endif %}
+
+<a
+    href="{{ url_for(
+        'main.download_file',
+        nama=mata_kuliah.nama,
+        kategori='artefak',
+        nama_file=file.nama
+    ) }}"
+    class="btn btn-outline-success btn-sm mb-1">
+
+    <i class="bi bi-download"></i>
+
+</a>
+
+                                    <form
+
+                                        action="{{ url_for('main.hapus_file', nama=mata_kuliah.nama, kategori='artefak', nama_file=file.nama) }}"
+
+                                        method="post"
+
+                                        class="d-inline"
+
+                                        onsubmit="return confirm('Hapus file ini?');">
+
+                                        <button
+
+                                            class="btn btn-outline-danger btn-sm">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="text-center py-5">
+
+                        <i class="bi bi-folder2-open display-4 text-muted"></i>
+
+                        <p class="mt-3 text-muted">
+
+                            Belum ada artefak.
+
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- ANALISIS AI -->
+    <!-- ====================================================== -->
+
+    <div class="card border-0 shadow-sm mt-4">
+
+        <div class="card-body text-center">
+
+            <div class="display-5 text-warning mb-3">
+
+                <i class="bi bi-cpu-fill"></i>
+
+            </div>
+
+            <h4 class="fw-bold">
+
+                Analisis Refleksi AI
+
+            </h4>
+
+            <p class="text-muted">
+
+                Jalankan analisis menggunakan Google Gemini berdasarkan seluruh modul dan artefak yang telah diunggah.
+
+            </p>
+
+            <a
+
+                href="{{ url_for('main.analisis', nama=mata_kuliah.nama) }}"
+
+                class="btn btn-lg btn-primary"
+
+                onclick="showLoading()">
+
+                <i class="bi bi-stars"></i>
+
+                Mulai Analisis AI
+
+            </a>
+
+            {% if hasil %}
+
+            <hr>
+
+            <div class="mt-3">
+
+                <a
+
+                    href="{{ url_for('main.hasil_terakhir', nama=mata_kuliah.nama) }}"
+
+                    class="btn btn-outline-success me-2">
+
+                    <i class="bi bi-eye-fill"></i>
+
+                    Lihat Hasil
+
+                </a>
+
+                <a
+
+                    href="{{ url_for('main.download_word', nama=mata_kuliah.nama) }}"
+
+                    class="btn btn-outline-primary">
+
+                    <i class="bi bi-file-earmark-word-fill"></i>
+
+                    Download Word
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+    <!-- ====================================================== -->
+    <!-- MODAL LOADING -->
+    <!-- ====================================================== -->
+
+    <div
+        class="modal fade"
+        id="loadingModal"
+        tabindex="-1"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-5">
+
+                    <div class="display-4 text-primary mb-3">
+
+                        <i class="bi bi-cpu-fill"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+
+                        AI Reflection Engine
+
+                    </h4>
+
+                    <p class="text-muted mb-4">
+
+                        Sedang menganalisis dokumen...
+
+                    </p>
+
+                    <div
+                        class="progress mb-4"
+                        style="height:22px;">
+
+                        <div
+                            id="progressBar"
+                            class="progress-bar progress-bar-striped progress-bar-animated"
+                            style="width:0%;">
+
+                            0%
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-start">
+
+                        <div id="step1">
+
+                            ⭕ Membaca dokumen
+
+                        </div>
+
+                        <div id="step2">
+
+                            ⭕ Menyusun prompt
+
+                        </div>
+
+                        <div id="step3">
+
+                            ⭕ Menghubungi Gemini
+
+                        </div>
+
+                        <div id="step4">
+
+                            ⭕ Menyimpan hasil
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function showLoading(){
+
+    const modal = new bootstrap.Modal(
+
+        document.getElementById(
+
+            "loadingModal"
+
+        )
+
+    );
+
+    modal.show();
+
+    const bar = document.getElementById(
+
+        "progressBar"
+
+    );
+
+    const steps = [
+
+        document.getElementById("step1"),
+
+        document.getElementById("step2"),
+
+        document.getElementById("step3"),
+
+        document.getElementById("step4")
+
+    ];
+
+    let progress = 0;
+
+    const timer = setInterval(function(){
+
+        progress += 5;
+
+        if(progress > 100){
+
+            clearInterval(timer);
+
+            return;
+
+        }
+
+        bar.style.width = progress + "%";
+
+        bar.innerHTML = progress + "%";
+
+        if(progress >= 15){
+
+            steps[0].innerHTML =
+
+                "✅ Membaca dokumen";
+
+        }
+
+        if(progress >= 40){
+
+            steps[1].innerHTML =
+
+                "✅ Menyusun prompt";
+
+        }
+
+        if(progress >= 70){
+
+            steps[2].innerHTML =
+
+                "🔄 Menghubungi Gemini";
+
+        }
+
+        if(progress >= 95){
+
+            steps[3].innerHTML =
+
+                "💾 Menyimpan hasil";
+
+        }
+
+    },250);
+
+}
+
+
+
+function setupUpload(
+
+    inputId,
+
+    buttonId
+
+){
+
+    const input = document.getElementById(
+
+        inputId
+
+    );
+
+    const button = document.getElementById(
+
+        buttonId
+
+    );
+
+    if(!input || !button){
+
+        return;
+
+    }
+
+    input.addEventListener(
+
+        "change",
+
+        function(){
+
+            if(input.files.length===0){
+
+                return;
+
+            }
+
+            const file = input.files[0];
+
+            const size =
+
+                file.size / 1024 / 1024;
+
+            if(size > 25){
+
+                alert(
+
+                    "Ukuran file maksimal 25 MB."
+
+                );
+
+                input.value="";
+
+                return;
+
+            }
+
+            button.innerHTML =
+
+                '<i class="bi bi-upload"></i> Upload (' +
+
+                file.name +
+
+                ')';
+
+        }
+
+    );
+
+}
+
+
+
+setupUpload(
+
+    "modulInput",
+
+    "uploadModulButton"
+
+);
+
+
+
+setupUpload(
+
+    "artefakInput",
+
+    "uploadArtefakButton"
+
+);
+const search = document.getElementById(
+
+    "searchFile"
+
+);
+
+if(search){
+
+    search.addEventListener(
+
+        "keyup",
+
+        function(){
+
+            const keyword =
+
+                this.value.toLowerCase();
+
+            document
+
+            .querySelectorAll(
+
+                ".file-item"
+
+            )
+
+            .forEach(function(item){
+
+                item.style.display =
+
+                item.innerText
+
+                .toLowerCase()
+
+                .includes(keyword)
+
+                ? ""
+
+                : "none";
+
+            });
+
+        }
+
+    );
+
+}
+</script>
+
+{% endblock %}

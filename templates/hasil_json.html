@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+Hasil Analisis
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header">
+
+        <h2>{{ hasil.mata_kuliah }}</h2>
+
+    </div>
+
+    <div class="card-body">
+
+        <p>
+
+            <strong>Model AI</strong><br>
+
+            {{ hasil.model }}
+
+        </p>
+
+        <p>
+
+            <strong>Waktu Proses</strong><br>
+
+            {{ "%.2f"|format(hasil.waktu_proses) }} detik
+
+        </p>
+
+        <hr>
+
+        <div style="white-space: pre-wrap;">
+
+            {{ hasil.isi }}
+
+        </div>
+
+    </div>
+
+    <div class="card-footer d-flex gap-2">
+
+        <a
+            href="/hasil/{{ hasil.mata_kuliah }}/word"
+            class="btn btn-success">
+
+            📥 Download Word
+
+        </a>
+
+        <a
+            href="/mata-kuliah/{{ hasil.mata_kuliah }}"
+            class="btn btn-secondary">
+
+            ← Kembali
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

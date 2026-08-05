@@ -42,31 +42,19 @@ class UploadService:
     ) -> Path:
 
         if kategori not in self.ALLOWED_KATEGORI:
-
-            raise ValueError(
-                "Kategori tidak valid."
-            )
+            raise ValueError("Kategori tidak valid.")
 
         if file is None:
-
-            raise ValueError(
-                "File belum dipilih."
-            )
+            raise ValueError("File belum dipilih.")
 
         if not file.filename:
+            raise ValueError("File belum dipilih.")
 
-            raise ValueError(
-                "File belum dipilih."
-            )
-
-        ekstensi = Path(
-            file.filename
-        ).suffix.lower()
+        ekstensi = Path(file.filename).suffix.lower()
 
         if ekstensi not in self.ALLOWED_EXTENSIONS:
-
             raise ValueError(
-                "Format file tidak didukung."
+                f"Format file {ekstensi} tidak didukung."
             )
 
         folder = (
@@ -86,10 +74,7 @@ class UploadService:
 
         tujuan = folder / nama_file
 
-        # ============================================
-        # Hindari file tertimpa
-        # ============================================
-
+        # Hindari nama file sama
         if tujuan.exists():
 
             stem = tujuan.stem
@@ -99,15 +84,11 @@ class UploadService:
 
             while True:
 
-                kandidat = (
-                    folder /
-                    f"{stem}_{nomor}{suffix}"
-                )
+                kandidat = folder / f"{stem}_{nomor}{suffix}"
 
                 if not kandidat.exists():
 
                     tujuan = kandidat
-
                     break
 
                 nomor += 1
@@ -124,31 +105,35 @@ class UploadService:
         self,
         nama_mk: str,
         kategori: str,
-        files
-    ):
+        files: list[FileStorage]
+    ) -> list[Path]:
 
         hasil = []
 
-        if files is None:
-
-            return hasil
+        if not files:
+            raise ValueError(
+                "Tidak ada file yang dipilih."
+            )
 
         for file in files:
 
             if file is None:
-
                 continue
 
             if not file.filename:
-
                 continue
 
-            path = self.upload(
-                nama_mk,
-                kategori,
-                file
+            hasil.append(
+                self.upload(
+                    nama_mk=nama_mk,
+                    kategori=kategori,
+                    file=file
+                )
             )
 
-            hasil.append(path)
+        if not hasil:
+            raise ValueError(
+                "Tidak ada file valid yang berhasil diupload."
+            )
 
         return hasil

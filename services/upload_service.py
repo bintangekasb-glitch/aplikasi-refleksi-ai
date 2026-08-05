@@ -31,7 +31,7 @@ class UploadService:
         self.root = Path("mata_kuliah")
 
     # =====================================================
-    # Upload
+    # Upload satu file
     # =====================================================
 
     def upload(
@@ -75,11 +75,10 @@ class UploadService:
             kategori
         )
 
-        if not folder.exists():
-
-            raise FileNotFoundError(
-                "Folder tujuan tidak ditemukan."
-            )
+        folder.mkdir(
+            parents=True,
+            exist_ok=True
+        )
 
         nama_file = secure_filename(
             file.filename
@@ -100,7 +99,10 @@ class UploadService:
 
             while True:
 
-                kandidat = folder / f"{stem}_{nomor}{suffix}"
+                kandidat = (
+                    folder /
+                    f"{stem}_{nomor}{suffix}"
+                )
 
                 if not kandidat.exists():
 
@@ -113,3 +115,40 @@ class UploadService:
         file.save(tujuan)
 
         return tujuan
+
+    # =====================================================
+    # Upload banyak file
+    # =====================================================
+
+    def upload_banyak(
+        self,
+        nama_mk: str,
+        kategori: str,
+        files
+    ):
+
+        hasil = []
+
+        if files is None:
+
+            return hasil
+
+        for file in files:
+
+            if file is None:
+
+                continue
+
+            if not file.filename:
+
+                continue
+
+            path = self.upload(
+                nama_mk,
+                kategori,
+                file
+            )
+
+            hasil.append(path)
+
+        return hasil

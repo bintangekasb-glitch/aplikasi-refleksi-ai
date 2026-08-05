@@ -23,6 +23,8 @@ from services.models import (
 
 class AIService:
 
+    MAX_RETRY = 3
+
     def __init__(self):
 
         if not GEMINI_API_KEY:
@@ -46,54 +48,84 @@ class AIService:
 
         mulai = time.perf_counter()
 
-        try:
+        error_terakhir = None
 
-            response = self.client.models.generate_content(
+        for percobaan in range(1, self.MAX_RETRY + 1):
 
-                model=AI_MODEL,
+            try:
 
-                contents=prompt.isi
-
-            )
-
-            selesai = time.perf_counter()
-
-            waktu = selesai - mulai
-
-            isi = getattr(
-                response,
-                "text",
-                ""
-            )
-
-            if not isi.strip():
-
-                raise RuntimeError(
-                    "Gemini tidak mengembalikan hasil analisis."
+                print(
+                    f"[Gemini] Percobaan {percobaan}/{self.MAX_RETRY}"
                 )
 
-            return HasilAnalisis(
+                response = self.client.models.generate_content(
 
-                mata_kuliah=mata_kuliah,
+                    model=AI_MODEL,
 
-                model=AI_MODEL,
+                    contents=prompt.isi
 
-                prompt_token=prompt.estimasi_token,
+                )
 
-                completion_token=0,
+                selesai = time.perf_counter()
 
-                total_token=prompt.estimasi_token,
+                isi = getattr(
+                    response,
+                    "text",
+                    ""
+                )
 
-                estimasi_biaya=0.0,
+                if not isi.strip():
 
-                waktu_proses=waktu,
+                    raise RuntimeError(
+                        "Gemini tidak mengembalikan hasil analisis."
+                    )
 
-                isi=isi
+                return HasilAnalisis(
 
-            )
+                    mata_kuliah=mata_kuliah,
 
-        except Exception as e:
+                    model=AI_MODEL,
 
-            raise RuntimeError(
-                f"Gagal menghubungi Google Gemini: {e}"
-            ) from e
+                    prompt_token=prompt.estimasi_token,
+
+                    completion_token=0,
+
+                    total_token=prompt.estimasi_token,
+
+                    estimasi_biaya=0.0,
+
+                    waktu_proses=selesai - mulai,
+
+                    isi=isi
+
+                )
+
+            except Exception as e:
+
+                error_terakhir = e
+
+                pesan = str(e)
+
+                print(f"[Gemini] Error: {pesan}")
+
+                # Retry hanya untuk error sementara
+                if (
+                    "503" in pesan
+                    or "429" in pesan
+                ) and percobaan < self.MAX_RETRY:
+
+                    jeda = 2 ** percobaan
+
+                    print(
+                        f"[Gemini] Menunggu {jeda} detik sebelum mencoba lagi..."
+                    )
+
+                    time.sleep(jeda)
+
+                    continue
+
+                break
+
+        raise RuntimeError(
+            f"Gagal menghubungi Google Gemini setelah {self.MAX_RETRY} percobaan.\n\n{error_terakhir}"
+        ) from error_terakhir

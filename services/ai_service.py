@@ -26,7 +26,6 @@ class AIService:
     def __init__(self):
 
         if not GEMINI_API_KEY:
-
             raise ValueError(
                 "GEMINI_API_KEY belum ditemukan pada file .env"
             )
@@ -35,66 +34,66 @@ class AIService:
             api_key=GEMINI_API_KEY
         )
 
-   # =====================================================
-# ANALISIS
-# =====================================================
+    # =====================================================
+    # ANALISIS
+    # =====================================================
 
-def analisis(
-    self,
-    mata_kuliah: str,
-    prompt: PromptAI
-) -> HasilAnalisis:
+    def analisis(
+        self,
+        mata_kuliah: str,
+        prompt: PromptAI
+    ) -> HasilAnalisis:
 
-    mulai = time.perf_counter()
+        mulai = time.perf_counter()
 
-    try:
+        try:
 
-        response = self.client.models.generate_content(
+            response = self.client.models.generate_content(
 
-            model=AI_MODEL,
+                model=AI_MODEL,
 
-            contents=prompt.isi
+                contents=prompt.isi
 
-        )
-
-        selesai = time.perf_counter()
-
-        waktu = selesai - mulai
-
-        isi = getattr(
-            response,
-            "text",
-            ""
-        )
-
-        if not isi.strip():
-
-            raise RuntimeError(
-                "Gemini tidak mengembalikan hasil analisis."
             )
 
-        return HasilAnalisis(
+            selesai = time.perf_counter()
 
-            mata_kuliah=mata_kuliah,
+            waktu = selesai - mulai
 
-            model=AI_MODEL,
+            isi = getattr(
+                response,
+                "text",
+                ""
+            )
 
-            prompt_token=prompt.estimasi_token,
+            if not isi.strip():
 
-            completion_token=0,
+                raise RuntimeError(
+                    "Gemini tidak mengembalikan hasil analisis."
+                )
 
-            total_token=prompt.estimasi_token,
+            return HasilAnalisis(
 
-            estimasi_biaya=0.0,
+                mata_kuliah=mata_kuliah,
 
-            waktu_proses=waktu,
+                model=AI_MODEL,
 
-            isi=isi
+                prompt_token=prompt.estimasi_token,
 
-        )
+                completion_token=0,
 
-    except Exception as e:
+                total_token=prompt.estimasi_token,
 
-        raise RuntimeError(
-            f"Gagal menghubungi Google Gemini: {e}"
-        ) from e
+                estimasi_biaya=0.0,
+
+                waktu_proses=waktu,
+
+                isi=isi
+
+            )
+
+        except Exception as e:
+
+            raise RuntimeError(
+                f"Gagal menghubungi Google Gemini: {e}"
+            ) from e
